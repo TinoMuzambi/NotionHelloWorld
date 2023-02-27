@@ -12,7 +12,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 		page_id: req.query.pageId as string,
 	});
 
-	res.status(200).json({ data: page });
+	const children = await notion.blocks.children.list({
+		block_id: req.query.pageId as string,
+		page_size: 50,
+	});
+
+	res.status(200).json({ data: { page, children } });
 };
 
 export default handler;
