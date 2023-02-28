@@ -17,6 +17,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 		page_size: 50,
 	});
 
+	const nestedChildren = children.results.map((child: any) => {
+		if (!child.has_children) {
+			return child;
+		} else {
+		}
+	});
+
 	res.status(200).json({ data: { page, children } });
 };
 
