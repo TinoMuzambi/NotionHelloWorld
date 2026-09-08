@@ -8,15 +8,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	const token = process.env.NOTION_INTEGRATION_TOKEN;
-	if (!token) {
+	const configuredPageId = process.env.NOTION_PAGE_ID;
+	if (!token || !configuredPageId) {
 		return res.status(503).json({ error: "Notion integration is not configured" });
 	}
 
 	const pageId = Array.isArray(req.query.pageId)
 		? req.query.pageId[0]
 		: req.query.pageId;
-	if (!pageId) {
-		return res.status(400).json({ error: "A page ID is required" });
+	if (pageId !== "default") {
+		return res.status(404).json({ error: "Page not found" });
 	}
 
 	const notion = new Client({
@@ -24,9 +25,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 
 	try {
-		const page = await notion.pages.retrieve({ page_id: pageId });
+		const page = await notion.pages.retrieve({ page_id: configuredPageId });
 		const children = await notion.blocks.children.list({
-			block_id: pageId,
+			block_id: configuredPageId,
 			page_size: 50,
 		});
 
